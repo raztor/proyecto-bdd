@@ -1,0 +1,119 @@
+# Variables de conexión compartidas por el backend y el seed (apuntan a los
+# nombres de servicio de la red de compose, no a localhost).
+x-backend-env: &backend-env
+  PG_HOST: postgres
+  PG_PORT: "5432"
+  PG_USER: ${POSTGRES_USER:-calidad_app}
+  PG_PASSWORD: ${POSTGRES_PASSWORD:-cambia_esta_clave}
+  PG_DATABASE: ${POSTGRES_DB:-calidad_aire}
+  MONGO_URL: mongodb://mongo:27017
+  MONGO_DB: ${MONGO_DB:-calidad_aire_audit}
+  PORT: "3000"
+  CORS_ORIGIN: http://localhost:8080
+  OPENAQ_API_KEY: ${OPENAQ_API_KEY:-}
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: calidad_aire_pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-calidad_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cambia_esta_clave}
+      POSTGRES_DB: ${POSTGRES_DB:-calidad_aire}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      # Los *.sql se ejecutan en orden alfabético SOLO al crear el volumen vacío.
+      - ./db/relational:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-calidad_app} -d ${POSTGRES_DB:-calidad_aire}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mongo:
+    image: mongo:7
+    container_name: calidad_aire_mongo
+    restart: unless-stopped
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    image: calidad_aire_backend
+    container_name: calidad_aire_backend
+    restart: unless-stopped
+    environment:
+      <<: *backend-env
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  frontend:
+    build: ./frontend
+    image: calidad_aire_frontend
+    container_name: calidad_aire_frontend
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  # Carga de datos sintéticos (one-shot). NO se levanta con `up`; ejecutar:
+  #   docker compose --profile seed run --rm seed
+  seed:
+    build: ./backend
+    image: calidad_aire_backend
+    profiles: ["seed"]
+    environment:
+      <<: *backend-env
+      SEED_MESES: ${SEED_MESES:-3}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    command: ["node", "dist/seed/seed.js"]
+
+  # Collector de mediciones reales (poll periódico a OpenAQ). NO se levanta con
+  # `up`; requiere OPENAQ_API_KEY. Ejecutar:
+  #   docker compose --profile collector up -d collector
+  collector:
+    build: ./backend
+    image: calidad_aire_backend
+    container_name: calidad_aire_collector
+    profiles: ["collector"]
+    restart: unless-stopped
+    environment:
+      <<: *backend-env
+      COLLECTOR_BBOX: ${COLLECTOR_BBOX:--70.9,-33.7,-70.4,-33.2}
+      COLLECTOR_INTERVAL_MIN: ${COLLECTOR_INTERVAL_MIN:-60}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    command: ["node", "dist/ingest/collector.js"]
+
+volumes:
+  pg_data:
+  mongo_data:
