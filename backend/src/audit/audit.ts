@@ -15,7 +15,9 @@ export interface AuditEntry {
 export async function logAudit(entry: AuditEntry): Promise<void> {
   try {
     await getDb().collection('auditoria').insertOne({
+      base_datos: 'postgresql',
       operacion: entry.operacion,
+      recurso: entry.tabla,
       tabla: entry.tabla,
       usuario: entry.usuario ?? 'anon',
       timestamp: new Date(),

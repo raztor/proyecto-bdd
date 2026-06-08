@@ -22,12 +22,11 @@ catalogosRouter.get('/contaminantes', async (req, res) => {
   const idioma = String(req.query.idioma ?? 'es');
   const { rows } = await query(
     `SELECT c.id, c.codigo, u.simbolo AS unidad,
-            COALESCE(t.texto, c.codigo) AS nombre
+            COALESCE(t.nombre, c.codigo) AS nombre
        FROM contaminante c
        JOIN unidad_medida u ON u.id = c.unidad_id
-       LEFT JOIN traduccion t
-              ON t.entidad = 'contaminante' AND t.entidad_id = c.id
-             AND t.campo = 'nombre' AND t.idioma_codigo = $1
+       LEFT JOIN contaminante_traduccion t
+              ON t.contaminante_id = c.id AND t.idioma_codigo = $1
       ORDER BY c.codigo`,
     [idioma],
   );

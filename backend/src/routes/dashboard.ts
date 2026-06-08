@@ -60,14 +60,14 @@ dashboardRouter.get('/', async (req, res) => {
            co.poblacion,
            c.id         AS contaminante_id,
            c.codigo     AS contaminante,
-           COALESCE(tcont.texto, c.codigo) AS contaminante_nombre,
+           COALESCE(tcont.nombre, c.codigo) AS contaminante_nombre,
            u.simbolo    AS unidad,
            p.promedio,
            p.n_mediciones,
            cat.codigo    AS categoria,
            cat.color_hex,
-           COALESCE(tcat.texto, cat.codigo) AS categoria_nombre,
-           trec.texto    AS recomendacion
+           COALESCE(tcat.nombre, cat.codigo) AS categoria_nombre,
+           trec.recomendacion
       FROM promedios p
       JOIN comuna co       ON co.id = p.comuna_id
       JOIN contaminante c  ON c.id  = p.contaminante_id
@@ -77,15 +77,15 @@ dashboardRouter.get('/', async (req, res) => {
              ON cat.contaminante_id = c.id
             AND p.promedio BETWEEN cat.valor_min AND cat.valor_max
       -- i18n: nombre del contaminante, nombre y recomendación de la categoría.
-      LEFT JOIN traduccion tcont
-             ON tcont.entidad = 'contaminante' AND tcont.entidad_id = c.id
-            AND tcont.campo = 'nombre' AND tcont.idioma_codigo = $${idiomaIdx}
-      LEFT JOIN traduccion tcat
-             ON tcat.entidad = 'categoria_calidad' AND tcat.entidad_id = cat.id
-            AND tcat.campo = 'nombre' AND tcat.idioma_codigo = $${idiomaIdx}
-      LEFT JOIN traduccion trec
-             ON trec.entidad = 'categoria_calidad' AND trec.entidad_id = cat.id
-            AND trec.campo = 'recomendacion' AND trec.idioma_codigo = $${idiomaIdx}
+      LEFT JOIN contaminante_traduccion tcont
+             ON tcont.contaminante_id = c.id
+            AND tcont.idioma_codigo = $${idiomaIdx}
+      LEFT JOIN categoria_calidad_traduccion tcat
+             ON tcat.categoria_id = cat.id
+            AND tcat.idioma_codigo = $${idiomaIdx}
+      LEFT JOIN categoria_calidad_traduccion trec
+             ON trec.categoria_id = cat.id
+            AND trec.idioma_codigo = $${idiomaIdx}
      ORDER BY co.nombre, c.codigo
   `;
 

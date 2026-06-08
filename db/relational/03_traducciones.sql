@@ -1,82 +1,45 @@
 --  Traducciones (i18n) — requisito: modelo relacional aplicado en >= 2 idiomas.
---  Se cargan español (es) e inglés (en) para los textos visibles al usuario:
---  nombre y descripción de cada contaminante, y nombre + recomendación de cada
---  categoría de calidad del aire.
---
---  Las FK lógicas (entidad_id) se resuelven por clave natural para no depender
---  de los valores concretos de id generados por IDENTITY.
+--  Español (es) e inglés (en) se cargan en tablas específicas con FK reales.
 
--- ── Contaminantes: nombre y descripción (es / en) ────────────────────────────
-INSERT INTO traduccion (idioma_codigo, entidad, entidad_id, campo, texto)
-SELECT v.idioma, 'contaminante', c.id, v.campo, v.texto
+-- Contaminantes: nombre y descripción (es / en).
+INSERT INTO contaminante_traduccion (contaminante_id, idioma_codigo, nombre, descripcion)
+SELECT c.id, v.idioma, v.nombre, v.descripcion
 FROM (VALUES
-    ('es', 'PM25', 'nombre',      'Material particulado fino (PM2.5)'),
-    ('es', 'PM25', 'descripcion', 'Partículas ≤ 2,5 µm; penetran profundo en pulmones y torrente sanguíneo.'),
-    ('en', 'PM25', 'nombre',      'Fine particulate matter (PM2.5)'),
-    ('en', 'PM25', 'descripcion', 'Particles ≤ 2.5 µm; penetrate deep into lungs and bloodstream.'),
+    ('es', 'PM25', 'Material particulado fino (PM2.5)', 'Particulas <= 2,5 um; penetran profundo en pulmones y torrente sanguineo.'),
+    ('en', 'PM25', 'Fine particulate matter (PM2.5)', 'Particles <= 2.5 um; penetrate deep into lungs and bloodstream.'),
 
-    ('es', 'PM10', 'nombre',      'Material particulado (PM10)'),
-    ('es', 'PM10', 'descripcion', 'Partículas ≤ 10 µm; afectan las vías respiratorias.'),
-    ('en', 'PM10', 'nombre',      'Particulate matter (PM10)'),
-    ('en', 'PM10', 'descripcion', 'Particles ≤ 10 µm; affect the respiratory tract.'),
+    ('es', 'PM10', 'Material particulado (PM10)', 'Particulas <= 10 um; afectan las vias respiratorias.'),
+    ('en', 'PM10', 'Particulate matter (PM10)', 'Particles <= 10 um; affect the respiratory tract.'),
 
-    ('es', 'O3',  'nombre',      'Ozono troposférico (O₃)'),
-    ('es', 'O3',  'descripcion', 'Gas oxidante; se forma con radiación solar a partir de precursores.'),
-    ('en', 'O3',  'nombre',      'Ground-level ozone (O₃)'),
-    ('en', 'O3',  'descripcion', 'Oxidizing gas formed under sunlight from precursors.'),
+    ('es', 'O3',  'Ozono troposferico (O3)', 'Gas oxidante; se forma con radiacion solar a partir de precursores.'),
+    ('en', 'O3',  'Ground-level ozone (O3)', 'Oxidizing gas formed under sunlight from precursors.'),
 
-    ('es', 'NO2', 'nombre',      'Dióxido de nitrógeno (NO₂)'),
-    ('es', 'NO2', 'descripcion', 'Gas asociado principalmente a la combustión vehicular.'),
-    ('en', 'NO2', 'nombre',      'Nitrogen dioxide (NO₂)'),
-    ('en', 'NO2', 'descripcion', 'Gas linked mainly to vehicle combustion.'),
+    ('es', 'NO2', 'Dioxido de nitrogeno (NO2)', 'Gas asociado principalmente a la combustion vehicular.'),
+    ('en', 'NO2', 'Nitrogen dioxide (NO2)', 'Gas linked mainly to vehicle combustion.'),
 
-    ('es', 'SO2', 'nombre',      'Dióxido de azufre (SO₂)'),
-    ('es', 'SO2', 'descripcion', 'Gas de procesos industriales y combustibles azufrados.'),
-    ('en', 'SO2', 'nombre',      'Sulfur dioxide (SO₂)'),
-    ('en', 'SO2', 'descripcion', 'Gas from industrial processes and sulfur-rich fuels.'),
+    ('es', 'SO2', 'Dioxido de azufre (SO2)', 'Gas de procesos industriales y combustibles azufrados.'),
+    ('en', 'SO2', 'Sulfur dioxide (SO2)', 'Gas from industrial processes and sulfur-rich fuels.'),
 
-    ('es', 'CO',  'nombre',      'Monóxido de carbono (CO)'),
-    ('es', 'CO',  'descripcion', 'Gas producto de la combustión incompleta.'),
-    ('en', 'CO',  'nombre',      'Carbon monoxide (CO)'),
-    ('en', 'CO',  'descripcion', 'Gas from incomplete combustion.')
-) AS v(idioma, cont, campo, texto)
-JOIN contaminante c ON c.codigo = v.cont
-ON CONFLICT (entidad, entidad_id, idioma_codigo, campo) DO NOTHING;
+    ('es', 'CO',  'Monoxido de carbono (CO)', 'Gas producto de la combustion incompleta.'),
+    ('en', 'CO',  'Carbon monoxide (CO)', 'Gas from incomplete combustion.')
+) AS v(idioma, codigo, nombre, descripcion)
+JOIN contaminante c ON c.codigo = v.codigo
+ON CONFLICT (contaminante_id, idioma_codigo) DO NOTHING;
 
--- ── Categorías: nombre (es / en) ─────────────────────────────────────────────
--- Mismas etiquetas para todas las filas que comparten 'codigo' (una por
--- contaminante), generadas por JOIN para no escribir decenas de filas a mano.
-INSERT INTO traduccion (idioma_codigo, entidad, entidad_id, campo, texto)
-SELECT v.idioma, 'categoria_calidad', cc.id, 'nombre', v.texto
+-- Categorías: nombre y recomendación de salud (es / en).
+INSERT INTO categoria_calidad_traduccion (categoria_id, idioma_codigo, nombre, recomendacion)
+SELECT cc.id, v.idioma, v.nombre, v.recomendacion
 FROM categoria_calidad cc
 JOIN (VALUES
-    ('es', 'BUENA',         'Buena'),
-    ('es', 'REGULAR',       'Regular'),
-    ('es', 'ALERTA',        'Alerta'),
-    ('es', 'PREEMERGENCIA', 'Preemergencia'),
-    ('es', 'EMERGENCIA',    'Emergencia'),
-    ('en', 'BUENA',         'Good'),
-    ('en', 'REGULAR',       'Moderate'),
-    ('en', 'ALERTA',        'Alert'),
-    ('en', 'PREEMERGENCIA', 'Pre-emergency'),
-    ('en', 'EMERGENCIA',    'Emergency')
-) AS v(idioma, codigo, texto) ON v.codigo = cc.codigo
-ON CONFLICT (entidad, entidad_id, idioma_codigo, campo) DO NOTHING;
-
--- ── Categorías: recomendación de salud (es / en) ─────────────────────────────
-INSERT INTO traduccion (idioma_codigo, entidad, entidad_id, campo, texto)
-SELECT v.idioma, 'categoria_calidad', cc.id, 'recomendacion', v.texto
-FROM categoria_calidad cc
-JOIN (VALUES
-    ('es', 'BUENA',         'Calidad del aire satisfactoria; sin riesgo para la población.'),
-    ('es', 'REGULAR',       'Aceptable; grupos sensibles deberían moderar el esfuerzo prolongado al aire libre.'),
-    ('es', 'ALERTA',        'Grupos sensibles pueden experimentar efectos; reducir la actividad física exterior.'),
-    ('es', 'PREEMERGENCIA', 'Efectos en la salud de la población; evitar la actividad física al aire libre.'),
-    ('es', 'EMERGENCIA',    'Riesgo grave para toda la población; permanecer en interiores y seguir a la autoridad.'),
-    ('en', 'BUENA',         'Air quality is satisfactory; no risk to the population.'),
-    ('en', 'REGULAR',       'Acceptable; sensitive groups should limit prolonged outdoor exertion.'),
-    ('en', 'ALERTA',        'Sensitive groups may experience effects; reduce outdoor physical activity.'),
-    ('en', 'PREEMERGENCIA', 'Health effects for the general population; avoid outdoor physical activity.'),
-    ('en', 'EMERGENCIA',    'Serious risk for the whole population; stay indoors and follow authorities.')
-) AS v(idioma, codigo, texto) ON v.codigo = cc.codigo
-ON CONFLICT (entidad, entidad_id, idioma_codigo, campo) DO NOTHING;
+    ('es', 'BUENA',         'Buena',          'Calidad del aire satisfactoria; sin riesgo para la poblacion.'),
+    ('es', 'REGULAR',       'Regular',        'Aceptable; grupos sensibles deberian moderar el esfuerzo prolongado al aire libre.'),
+    ('es', 'ALERTA',        'Alerta',         'Grupos sensibles pueden experimentar efectos; reducir la actividad fisica exterior.'),
+    ('es', 'PREEMERGENCIA', 'Preemergencia',  'Efectos en la salud de la poblacion; evitar la actividad fisica al aire libre.'),
+    ('es', 'EMERGENCIA',    'Emergencia',     'Riesgo grave para toda la poblacion; permanecer en interiores y seguir a la autoridad.'),
+    ('en', 'BUENA',         'Good',           'Air quality is satisfactory; no risk to the population.'),
+    ('en', 'REGULAR',       'Moderate',       'Acceptable; sensitive groups should limit prolonged outdoor exertion.'),
+    ('en', 'ALERTA',        'Alert',          'Sensitive groups may experience effects; reduce outdoor physical activity.'),
+    ('en', 'PREEMERGENCIA', 'Pre-emergency',  'Health effects for the general population; avoid outdoor physical activity.'),
+    ('en', 'EMERGENCIA',    'Emergency',      'Serious risk for the whole population; stay indoors and follow authorities.')
+) AS v(idioma, codigo, nombre, recomendacion) ON v.codigo = cc.codigo
+ON CONFLICT (categoria_id, idioma_codigo) DO NOTHING;

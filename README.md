@@ -20,14 +20,19 @@ categorías de calidad del aire (Buena → Emergencia).
 proyecto-bdd/
 ├── docker-compose.yml         # PostgreSQL + MongoDB
 ├── .env.example               # variables (copiar a .env)
+├── docs/
+│   ├── instrucciones.pdf       # enunciado del proyecto
+│   └── informe.md              # problemática, solución, datos e indicador
 ├── db/
 │   ├── relational/            # DDL + catálogos (se auto-cargan en Postgres)
 │   │   ├── 01_schema.sql       #   modelo físico (CREATE TABLE, PK, FK, índices)
 │   │   ├── 02_catalogos.sql    #   contaminantes, categorías, comunas, estaciones
 │   │   └── 03_traducciones.sql #   i18n (es/en)
+│   ├── nosql/                  # modelo físico MongoDB (auditoría CRUD)
+│   │   ├── 01_auditoria.js      #   validador JSON Schema + índices
+│   │   └── README.md            #   descripción de colección y campos
 │   └── mer/                    # diagrama entidad-relación
-│       ├── mer.drawio          #   editable en draw.io / diagrams.net
-│       ├── mer.dot             #   fuente Graphviz (alternativa)
+│       ├── mer.dot             #   fuente Graphviz
 │       ├── mer.png
 │       └── mer.svg
 ├── backend/                   # API Express + TypeScript
@@ -92,5 +97,5 @@ cd frontend && npm install && npm run dev                  # SPA en :5173 (proxy
 | Toda BD con ≥ 1.000 registros | `MEDICION` (~69.000) en Postgres; `auditoria` (1.200+) en MongoDB |
 | Filtro por ≥ 1 atributo | Dashboard filtra por comuna, contaminante y rango de fechas |
 | BD relacional Y no relacional | PostgreSQL + MongoDB |
-| Modelo relacional en ≥ 2 idiomas | Tabla `TRADUCCION` con textos es/en (selector de idioma en el dashboard) |
-| MER + modelo físico | `db/mer/mer.*` y `db/relational/01_schema.sql` |
+| Modelo relacional en ≥ 2 idiomas | Tablas `CONTAMINANTE_TRADUCCION` y `CATEGORIA_CALIDAD_TRADUCCION` con textos es/en |
+| MER + modelo físico | `db/mer/mer.*`, `db/relational/01_schema.sql` y `db/nosql/README.md` |

@@ -158,17 +158,17 @@ async function main() {
       HAVING AVG(prom) >= 80
     ),
     ins_epi AS (
-      INSERT INTO episodio (comuna_id, categoria_id, fecha)
-      SELECT cd.comuna_id, cat.id, cd.dia
+      INSERT INTO episodio (comuna_id, contaminante_id, categoria_id, fecha)
+      SELECT cd.comuna_id, c.id, cat.id, cd.dia
         FROM comuna_dia cd
         JOIN contaminante c       ON c.codigo = 'PM25'
         JOIN categoria_calidad cat ON cat.contaminante_id = c.id
                                   AND cd.prom BETWEEN cat.valor_min AND cat.valor_max
-      ON CONFLICT (comuna_id, fecha) DO NOTHING
+      ON CONFLICT (comuna_id, contaminante_id, fecha) DO NOTHING
       RETURNING id, comuna_id, fecha
     )
-    INSERT INTO episodio_estacion (episodio_id, estacion_id, valor_promedio)
-    SELECT ie.id, d.estacion_id, ROUND(d.prom, 2)
+    INSERT INTO episodio_estacion (episodio_id, comuna_id, estacion_id, valor_promedio)
+    SELECT ie.id, ie.comuna_id, d.estacion_id, ROUND(d.prom, 2)
       FROM ins_epi ie
       JOIN diario d ON d.comuna_id = ie.comuna_id AND d.dia = ie.fecha
     ON CONFLICT DO NOTHING
@@ -187,9 +187,12 @@ async function main() {
   const docs = Array.from({ length: N_AUDIT }, () => {
     const diasAtras = faker.number.int({ min: 0, max: 90 });
     const segAtras = faker.number.int({ min: 0, max: 86400 });
+    const tabla = faker.helpers.arrayElement(tablas);
     return {
+      base_datos: 'postgresql',
       operacion: faker.helpers.arrayElement(operaciones),
-      tabla: faker.helpers.arrayElement(tablas),
+      recurso: tabla,
+      tabla,
       usuario: faker.helpers.arrayElement(usuarios),
       timestamp: new Date(Date.now() - diasAtras * 86400000 - segAtras * 1000),
       payload: { sintetico: true },

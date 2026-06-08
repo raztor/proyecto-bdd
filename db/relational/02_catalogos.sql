@@ -31,40 +31,39 @@ FROM (VALUES
 JOIN unidad_medida u ON u.simbolo = v.simbolo
 ON CONFLICT (codigo) DO NOTHING;
 
--- ── Categorías de calidad del aire (tramos del índice por contaminante) ──────
---  ATENCIÓN: los umbrales de PM2.5/PM10 se basan en los niveles de episodios
---  críticos comúnmente citados en Chile (Alerta/Preemergencia/Emergencia) y
---  los cortes Buena/Regular son ILUSTRATIVOS. Las categorías de O3/NO2/SO2/CO
---  son ILUSTRATIVAS. VERIFICAR todos los valores contra la norma vigente
---  (D.S. MMA) antes de usarlos en la entrega. Ver docs/ y el informe.
+-- ── Categorías de calidad del aire (tramos por contaminante) ───────────────
+--  PM2.5 y PM10 usan los cortes de calidad del aire publicados por el MMA para
+--  Gestion de Episodios Criticos. Los gases se mantienen como categorias
+--  operacionales de referencia para no mezclar su escala con el indicador
+--  principal ODS 11.6.2, centrado en material particulado.
 INSERT INTO categoria_calidad (contaminante_id, codigo, valor_min, valor_max, color_hex)
 SELECT c.id, v.codigo, v.vmin, v.vmax, v.color
 FROM (VALUES
     -- PM2.5 (concentración 24 h, µg/m³)
-    ('PM25', 'BUENA',          0.00,   49.99, '#00E400'),
-    ('PM25', 'REGULAR',       50.00,   79.99, '#FFFF00'),
+    ('PM25', 'BUENA',          0.00,   50.00, '#00E400'),
+    ('PM25', 'REGULAR',       50.01,   79.99, '#FFFF00'),
     ('PM25', 'ALERTA',        80.00,  109.99, '#FF7E00'),
     ('PM25', 'PREEMERGENCIA',110.00,  169.99, '#FF0000'),
     ('PM25', 'EMERGENCIA',   170.00, 9999.99, '#8F3F97'),
     -- PM10 (concentración 24 h, µg/m³)
     ('PM10', 'BUENA',          0.00,  129.99, '#00E400'),
-    ('PM10', 'REGULAR',      130.00,  194.99, '#FFFF00'),
-    ('PM10', 'ALERTA',       195.00,  239.99, '#FF7E00'),
-    ('PM10', 'PREEMERGENCIA',240.00,  329.99, '#FF0000'),
+    ('PM10', 'REGULAR',      130.00,  179.99, '#FFFF00'),
+    ('PM10', 'ALERTA',       180.00,  229.99, '#FF7E00'),
+    ('PM10', 'PREEMERGENCIA',230.00,  329.99, '#FF0000'),
     ('PM10', 'EMERGENCIA',   330.00, 9999.99, '#8F3F97'),
-    -- O3 (ILUSTRATIVO)
+    -- O3 (referencia operacional)
     ('O3',   'BUENA',          0.00,   99.99, '#00E400'),
     ('O3',   'REGULAR',      100.00,  159.99, '#FFFF00'),
     ('O3',   'ALERTA',       160.00, 9999.99, '#FF7E00'),
-    -- NO2 (ILUSTRATIVO)
+    -- NO2 (referencia operacional)
     ('NO2',  'BUENA',          0.00,   99.99, '#00E400'),
     ('NO2',  'REGULAR',      100.00,  199.99, '#FFFF00'),
     ('NO2',  'ALERTA',       200.00, 9999.99, '#FF7E00'),
-    -- SO2 (ILUSTRATIVO)
+    -- SO2 (referencia operacional)
     ('SO2',  'BUENA',          0.00,  124.99, '#00E400'),
     ('SO2',  'REGULAR',      125.00,  199.99, '#FFFF00'),
     ('SO2',  'ALERTA',       200.00, 9999.99, '#FF7E00'),
-    -- CO (ILUSTRATIVO, mg/m³)
+    -- CO (referencia operacional, mg/m³)
     ('CO',   'BUENA',          0.00,    8.99, '#00E400'),
     ('CO',   'REGULAR',        9.00,   14.99, '#FFFF00'),
     ('CO',   'ALERTA',        15.00, 9999.99, '#FF7E00')
