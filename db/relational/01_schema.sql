@@ -75,20 +75,34 @@ CREATE UNIQUE INDEX idx_medicion_est_cont_fecha
 -- ---------------------------------------------------------------------------
 --  Clasificación de calidad del aire y episodios críticos
 -- ---------------------------------------------------------------------------
+--  Tramos de calidad del aire por contaminante.
+--
+--  El rango se modela con el tipo nativo `numrange` de PostgreSQL en lugar de
+--  dos columnas (valor_min, valor_max) con un sentinel "9999.99" para
+--  representar el extremo abierto. Ventajas:
+--    - el extremo superior abierto se expresa con 'infinity' real, no con un
+--      magic number;
+--    - la operación de pertenencia es nativa: `rango @> p.promedio::numeric`;
+--    - el `EXCLUDE USING gist` opera directamente sobre el tipo, sin
+--      construir el rango en cada inserción.
+--
+--  Convención: se usan rangos semi-abiertos `[min, max)`. Así dos tramos
+--  consecutivos comparten el extremo sin solaparse: `[0,50)` y `[50,80)` son
+--  válidos en el `EXCLUDE` y un valor de 50 cae en el segundo tramo.
 CREATE TABLE categoria_calidad (
     id              INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     contaminante_id INTEGER NOT NULL REFERENCES contaminante(id),
     codigo          VARCHAR(20)  NOT NULL,   -- BUENA, REGULAR, ALERTA, PREEMERGENCIA, EMERGENCIA
-    valor_min       DECIMAL(8,2) NOT NULL,
-    valor_max       DECIMAL(8,2) NOT NULL,
+    rango           numrange     NOT NULL,
     color_hex       VARCHAR(7)   NOT NULL,
-    CHECK (valor_max >= valor_min),
+    CHECK (NOT isempty(rango)),
+    CHECK (lower(rango) IS NOT NULL AND lower(rango) >= 0),
     CHECK (color_hex ~ '^#[0-9A-Fa-f]{6}$'),
     UNIQUE (contaminante_id, codigo),
     UNIQUE (contaminante_id, id),
     EXCLUDE USING gist (
         contaminante_id WITH =,
-        numrange(valor_min, valor_max, '[]') WITH &&
+        rango WITH &&
     )
 );
 

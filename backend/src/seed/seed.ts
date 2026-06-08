@@ -163,7 +163,7 @@ async function main() {
         FROM comuna_dia cd
         JOIN contaminante c       ON c.codigo = 'PM25'
         JOIN categoria_calidad cat ON cat.contaminante_id = c.id
-                                  AND cd.prom BETWEEN cat.valor_min AND cat.valor_max
+                                  AND cat.rango @> cd.prom::numeric
       ON CONFLICT (comuna_id, contaminante_id, fecha) DO NOTHING
       RETURNING id, comuna_id, fecha
     )

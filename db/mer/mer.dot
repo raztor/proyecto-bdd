@@ -76,8 +76,7 @@ digraph MER {
         <tr><td align="left"><b>PK</b> id</td></tr>
         <tr><td align="left"><b>FK</b> contaminante_id</td></tr>
         <tr><td align="left">codigo</td></tr>
-        <tr><td align="left">valor_min</td></tr>
-        <tr><td align="left">valor_max</td></tr>
+        <tr><td align="left">rango (numrange)</td></tr>
         <tr><td align="left">color_hex</td></tr>
       </table>>];
 

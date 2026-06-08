@@ -78,8 +78,12 @@ Decisiones principales:
 
 - `medicion` tiene FK compuesta hacia `estacion_contaminante`, por lo que no se
   pueden insertar mediciones de contaminantes que la estación no mide.
-- `categoria_calidad` usa una restricción de exclusión para impedir rangos
-  solapados dentro del mismo contaminante.
+- `categoria_calidad` modela el tramo como una columna del tipo nativo
+  `numrange` de PostgreSQL (semi-abierto `[min, max)`) y aplica una restricción
+  de exclusión `EXCLUDE USING gist` para impedir rangos solapados dentro del
+  mismo contaminante. El extremo superior abierto se expresa con `'infinity'`
+  en lugar de un valor sentinel, y la clasificación se realiza con el operador
+  de pertenencia nativo (`rango @> valor::numeric`).
 - `episodio` incluye `contaminante_id` y `categoria_id`, con FK compuesta para
   asegurar que la categoría corresponda al contaminante del episodio.
 - `episodio_estacion` valida que la estación asociada pertenezca a la misma

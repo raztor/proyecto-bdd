@@ -72,10 +72,10 @@ dashboardRouter.get('/', async (req, res) => {
       JOIN comuna co       ON co.id = p.comuna_id
       JOIN contaminante c  ON c.id  = p.contaminante_id
       JOIN unidad_medida u ON u.id  = c.unidad_id
-      -- Clasificación: el promedio cae dentro de [valor_min, valor_max] de una categoría.
+      -- Clasificación: el promedio cae dentro del numrange de la categoría.
       LEFT JOIN categoria_calidad cat
              ON cat.contaminante_id = c.id
-            AND p.promedio BETWEEN cat.valor_min AND cat.valor_max
+            AND cat.rango @> p.promedio::numeric
       -- i18n: nombre del contaminante, nombre y recomendación de la categoría.
       LEFT JOIN contaminante_traduccion tcont
              ON tcont.contaminante_id = c.id

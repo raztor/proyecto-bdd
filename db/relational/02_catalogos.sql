@@ -36,37 +36,40 @@ ON CONFLICT (codigo) DO NOTHING;
 --  Gestion de Episodios Criticos. Los gases se mantienen como categorias
 --  operacionales de referencia para no mezclar su escala con el indicador
 --  principal ODS 11.6.2, centrado en material particulado.
-INSERT INTO categoria_calidad (contaminante_id, codigo, valor_min, valor_max, color_hex)
-SELECT c.id, v.codigo, v.vmin, v.vmax, v.color
+--
+--  Los tramos se expresan como `numrange` semi-abiertos `[min, max)`. El tope
+--  superior usa 'infinity' (numérico) para evitar el sentinel 9999.99.
+INSERT INTO categoria_calidad (contaminante_id, codigo, rango, color_hex)
+SELECT c.id, v.codigo, numrange(v.vmin, v.vmax, '[)'), v.color
 FROM (VALUES
     -- PM2.5 (concentración 24 h, µg/m³)
-    ('PM25', 'BUENA',          0.00,   50.00, '#00E400'),
-    ('PM25', 'REGULAR',       50.01,   79.99, '#FFFF00'),
-    ('PM25', 'ALERTA',        80.00,  109.99, '#FF7E00'),
-    ('PM25', 'PREEMERGENCIA',110.00,  169.99, '#FF0000'),
-    ('PM25', 'EMERGENCIA',   170.00, 9999.99, '#8F3F97'),
+    ('PM25', 'BUENA',          0.00::numeric,   50.00::numeric, '#00E400'),
+    ('PM25', 'REGULAR',       50.00::numeric,   80.00::numeric, '#FFFF00'),
+    ('PM25', 'ALERTA',        80.00::numeric,  110.00::numeric, '#FF7E00'),
+    ('PM25', 'PREEMERGENCIA',110.00::numeric,  170.00::numeric, '#FF0000'),
+    ('PM25', 'EMERGENCIA',   170.00::numeric, 'infinity'::numeric, '#8F3F97'),
     -- PM10 (concentración 24 h, µg/m³)
-    ('PM10', 'BUENA',          0.00,  129.99, '#00E400'),
-    ('PM10', 'REGULAR',      130.00,  179.99, '#FFFF00'),
-    ('PM10', 'ALERTA',       180.00,  229.99, '#FF7E00'),
-    ('PM10', 'PREEMERGENCIA',230.00,  329.99, '#FF0000'),
-    ('PM10', 'EMERGENCIA',   330.00, 9999.99, '#8F3F97'),
+    ('PM10', 'BUENA',          0.00::numeric,  130.00::numeric, '#00E400'),
+    ('PM10', 'REGULAR',      130.00::numeric,  180.00::numeric, '#FFFF00'),
+    ('PM10', 'ALERTA',       180.00::numeric,  230.00::numeric, '#FF7E00'),
+    ('PM10', 'PREEMERGENCIA',230.00::numeric,  330.00::numeric, '#FF0000'),
+    ('PM10', 'EMERGENCIA',   330.00::numeric, 'infinity'::numeric, '#8F3F97'),
     -- O3 (referencia operacional)
-    ('O3',   'BUENA',          0.00,   99.99, '#00E400'),
-    ('O3',   'REGULAR',      100.00,  159.99, '#FFFF00'),
-    ('O3',   'ALERTA',       160.00, 9999.99, '#FF7E00'),
+    ('O3',   'BUENA',          0.00::numeric,  100.00::numeric, '#00E400'),
+    ('O3',   'REGULAR',      100.00::numeric,  160.00::numeric, '#FFFF00'),
+    ('O3',   'ALERTA',       160.00::numeric, 'infinity'::numeric, '#FF7E00'),
     -- NO2 (referencia operacional)
-    ('NO2',  'BUENA',          0.00,   99.99, '#00E400'),
-    ('NO2',  'REGULAR',      100.00,  199.99, '#FFFF00'),
-    ('NO2',  'ALERTA',       200.00, 9999.99, '#FF7E00'),
+    ('NO2',  'BUENA',          0.00::numeric,  100.00::numeric, '#00E400'),
+    ('NO2',  'REGULAR',      100.00::numeric,  200.00::numeric, '#FFFF00'),
+    ('NO2',  'ALERTA',       200.00::numeric, 'infinity'::numeric, '#FF7E00'),
     -- SO2 (referencia operacional)
-    ('SO2',  'BUENA',          0.00,  124.99, '#00E400'),
-    ('SO2',  'REGULAR',      125.00,  199.99, '#FFFF00'),
-    ('SO2',  'ALERTA',       200.00, 9999.99, '#FF7E00'),
+    ('SO2',  'BUENA',          0.00::numeric,  125.00::numeric, '#00E400'),
+    ('SO2',  'REGULAR',      125.00::numeric,  200.00::numeric, '#FFFF00'),
+    ('SO2',  'ALERTA',       200.00::numeric, 'infinity'::numeric, '#FF7E00'),
     -- CO (referencia operacional, mg/m³)
-    ('CO',   'BUENA',          0.00,    8.99, '#00E400'),
-    ('CO',   'REGULAR',        9.00,   14.99, '#FFFF00'),
-    ('CO',   'ALERTA',        15.00, 9999.99, '#FF7E00')
+    ('CO',   'BUENA',          0.00::numeric,    9.00::numeric, '#00E400'),
+    ('CO',   'REGULAR',        9.00::numeric,   15.00::numeric, '#FFFF00'),
+    ('CO',   'ALERTA',        15.00::numeric, 'infinity'::numeric, '#FF7E00')
 ) AS v(cont, codigo, vmin, vmax, color)
 JOIN contaminante c ON c.codigo = v.cont
 ON CONFLICT (contaminante_id, codigo) DO NOTHING;
