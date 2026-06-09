@@ -27,14 +27,15 @@ proyecto-bdd/
 │   ├── relational/            # DDL + catálogos (se auto-cargan en Postgres)
 │   │   ├── 01_schema.sql       #   modelo físico (CREATE TABLE, PK, FK, índices)
 │   │   ├── 02_catalogos.sql    #   contaminantes, categorías, comunas, estaciones
-│   │   └── 03_traducciones.sql #   i18n (es/en)
+│   │   ├── 03_traducciones.sql #   i18n (es/en)
+│   │   └── 04_seed_demo.sql    #   seed declarativo (>1.000 mediciones)
 │   ├── nosql/                  # modelo físico MongoDB (auditoría CRUD)
 │   │   ├── 01_auditoria.js      #   validador JSON Schema + índices
+│   │   ├── 02_seed_auditoria.js #   seed declarativo (>1.000 documentos)
 │   │   └── README.md            #   descripción de colección y campos
-│   └── mer/                    # diagrama entidad-relación
-│       ├── mer.dot             #   fuente Graphviz
-│       ├── mer.png
-│       └── mer.svg
+│   └── mer/                    # diagramas conceptual y físico
+│       ├── mer.{dot,png,svg}            # MER (notación Chen)
+│       └── modelo_fisico.{dot,png,svg}  # modelo físico (tablas, PK, FK)
 ├── backend/                   # API Express + TypeScript
 │   └── src/
 │       ├── routes/             # estaciones (Form A), reportes (Form B), dashboard
@@ -98,4 +99,5 @@ cd frontend && npm install && npm run dev                  # SPA en :5173 (proxy
 | Filtro por ≥ 1 atributo | Dashboard filtra por comuna, contaminante y rango de fechas |
 | BD relacional Y no relacional | PostgreSQL + MongoDB |
 | Modelo relacional en ≥ 2 idiomas | Tablas `CONTAMINANTE_TRADUCCION` y `CATEGORIA_CALIDAD_TRADUCCION` con textos es/en |
-| MER + modelo físico | `db/mer/mer.*`, `db/relational/01_schema.sql` y `db/nosql/README.md` |
+| MER (conceptual) | `db/mer/mer.svg` (notación Chen) |
+| Modelo físico | `db/mer/modelo_fisico.svg`, `db/relational/01_schema.sql` y `db/nosql/README.md` |

@@ -71,8 +71,12 @@ operacional.
 
 ## Modelo relacional
 
-El modelo relacional se entrega en `db/relational/01_schema.sql` y el MER en
-`db/mer/mer.svg` y `db/mer/mer.png`.
+El **MER conceptual** (notación Chen: entidades, relaciones, atributos y
+cardinalidades) se entrega en `db/mer/mer.svg` y `db/mer/mer.png`. El **modelo
+físico** —tablas, claves primarias, claves foráneas (incluidas las
+compuestas) e índices— se entrega como diagrama en
+`db/mer/modelo_fisico.svg` y como DDL ejecutable en
+`db/relational/01_schema.sql`.
 
 Decisiones principales:
 

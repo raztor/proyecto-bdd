@@ -1,0 +1,169 @@
+digraph MER {
+    rankdir=LR;
+    bgcolor="white";
+    nodesep=0.7;
+    ranksep=1.6;
+    splines=ortho;
+    graph [fontname="Helvetica", pad="0.4"];
+    node  [shape=plaintext, fontname="Helvetica", fontsize=10];
+    edge  [dir=both, arrowtail=teetee, arrowhead=crowodot,
+           color="#37474F", penwidth=1.1, fontname="Helvetica", fontsize=9];
+
+    region [label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
+        <tr><td bgcolor="#1565C0"><font color="white"><b>REGION</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> id</td></tr>
+        <tr><td align="left">codigo</td></tr>
+      </table>>];
+
+    comuna [label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
+        <tr><td bgcolor="#1565C0"><font color="white"><b>COMUNA</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> id</td></tr>
+        <tr><td align="left"><b>FK</b> region_id</td></tr>
+        <tr><td align="left">nombre</td></tr>
+        <tr><td align="left">poblacion</td></tr>
+      </table>>];
+
+    estacion [label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
+        <tr><td bgcolor="#1565C0"><font color="white"><b>ESTACION</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> id</td></tr>
+        <tr><td align="left"><b>FK</b> comuna_id</td></tr>
+        <tr><td align="left">nombre</td></tr>
+        <tr><td align="left">latitud</td></tr>
+        <tr><td align="left">longitud</td></tr>
+        <tr><td align="left">fecha_instalacion</td></tr>
+      </table>>];
+
+    unidad_medida [label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
+        <tr><td bgcolor="#00838F"><font color="white"><b>UNIDAD_MEDIDA</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> id</td></tr>
+        <tr><td align="left">simbolo</td></tr>
+      </table>>];
+
+    contaminante [label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
+        <tr><td bgcolor="#00838F"><font color="white"><b>CONTAMINANTE</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> id</td></tr>
+        <tr><td align="left"><b>FK</b> unidad_id</td></tr>
+        <tr><td align="left">codigo</td></tr>
+      </table>>];
+
+    estacion_contaminante [label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
+        <tr><td bgcolor="#546E7A"><font color="white"><b>ESTACION_CONTAMINANTE</b></font></td></tr>
+        <tr><td align="left"><b>PK,FK</b> estacion_id</td></tr>
+        <tr><td align="left"><b>PK,FK</b> contaminante_id</td></tr>
+        <tr><td align="left">activo</td></tr>
+      </table>>];
+
+    medicion [label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
+        <tr><td bgcolor="#00838F"><font color="white"><b>MEDICION</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> id (BIGINT)</td></tr>
+        <tr><td align="left"><b>FK</b> estacion_id</td></tr>
+        <tr><td align="left"><b>FK</b> contaminante_id</td></tr>
+        <tr><td align="left">fecha_hora</td></tr>
+        <tr><td align="left">valor</td></tr>
+        <tr><td align="left">validado</td></tr>
+      </table>>];
+
+    categoria_calidad [label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
+        <tr><td bgcolor="#00838F"><font color="white"><b>CATEGORIA_CALIDAD</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> id</td></tr>
+        <tr><td align="left"><b>FK</b> contaminante_id</td></tr>
+        <tr><td align="left">codigo</td></tr>
+        <tr><td align="left">rango (numrange)</td></tr>
+        <tr><td align="left">color_hex</td></tr>
+      </table>>];
+
+    episodio [label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
+        <tr><td bgcolor="#C62828"><font color="white"><b>EPISODIO</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> id</td></tr>
+        <tr><td align="left"><b>FK</b> comuna_id</td></tr>
+        <tr><td align="left"><b>FK</b> contaminante_id</td></tr>
+        <tr><td align="left"><b>FK</b> categoria_id</td></tr>
+        <tr><td align="left">fecha</td></tr>
+      </table>>];
+
+    episodio_estacion [label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
+        <tr><td bgcolor="#546E7A"><font color="white"><b>EPISODIO_ESTACION</b></font></td></tr>
+        <tr><td align="left"><b>PK,FK</b> episodio_id</td></tr>
+        <tr><td align="left"><b>FK</b> comuna_id</td></tr>
+        <tr><td align="left"><b>PK,FK</b> estacion_id</td></tr>
+        <tr><td align="left">valor_promedio</td></tr>
+      </table>>];
+
+    reporte_ciudadano [label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
+        <tr><td bgcolor="#2E7D32"><font color="white"><b>REPORTE_CIUDADANO</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> id</td></tr>
+        <tr><td align="left"><b>FK</b> comuna_id</td></tr>
+        <tr><td align="left">fecha_hora</td></tr>
+        <tr><td align="left">nivel_percibido</td></tr>
+      </table>>];
+
+    idioma [label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
+        <tr><td bgcolor="#6A1B9A"><font color="white"><b>IDIOMA</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> codigo</td></tr>
+        <tr><td align="left">nombre</td></tr>
+      </table>>];
+
+    contaminante_traduccion [label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
+        <tr><td bgcolor="#6A1B9A"><font color="white"><b>CONTAMINANTE_TRADUCCION</b></font></td></tr>
+        <tr><td align="left"><b>PK,FK</b> contaminante_id</td></tr>
+        <tr><td align="left"><b>PK,FK</b> idioma_codigo</td></tr>
+        <tr><td align="left">nombre</td></tr>
+        <tr><td align="left">descripcion</td></tr>
+      </table>>];
+
+    categoria_calidad_traduccion [label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
+        <tr><td bgcolor="#6A1B9A"><font color="white"><b>CATEGORIA_CALIDAD_TRADUCCION</b></font></td></tr>
+        <tr><td align="left"><b>PK,FK</b> categoria_id</td></tr>
+        <tr><td align="left"><b>PK,FK</b> idioma_codigo</td></tr>
+        <tr><td align="left">nombre</td></tr>
+        <tr><td align="left">recomendacion</td></tr>
+      </table>>];
+
+    evento_auditoria_relacional [label=<
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
+        <tr><td bgcolor="#455A64"><font color="white"><b>EVENTO_AUDITORIA_RELACIONAL</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> id (BIGINT)</td></tr>
+        <tr><td align="left">base_datos</td></tr>
+        <tr><td align="left">operacion</td></tr>
+        <tr><td align="left">recurso</td></tr>
+        <tr><td align="left">usuario_logico</td></tr>
+        <tr><td align="left">ocurrido_en</td></tr>
+        <tr><td align="left">criterio</td></tr>
+        <tr><td align="left">datos_antes</td></tr>
+        <tr><td align="left">datos_despues</td></tr>
+        <tr><td align="left">resultado</td></tr>
+        <tr><td align="left">sincronizado_mongo</td></tr>
+      </table>>];
+
+    region        -> comuna                [xlabel="tiene"];
+    comuna        -> estacion              [xlabel="posee"];
+    comuna        -> episodio              [xlabel="registra"];
+    comuna        -> reporte_ciudadano     [xlabel="recibe"];
+    estacion      -> estacion_contaminante [xlabel="mide"];
+    estacion      -> episodio_estacion     [xlabel="participa"];
+    contaminante  -> estacion_contaminante [xlabel="medido por"];
+    contaminante  -> categoria_calidad     [xlabel="clasifica"];
+    unidad_medida -> contaminante          [xlabel="expresa"];
+    estacion_contaminante -> medicion      [xlabel="genera"];
+    contaminante  -> episodio              [xlabel="origina"];
+    categoria_calidad -> episodio          [xlabel="califica"];
+    episodio      -> episodio_estacion     [xlabel="agrupa"];
+    idioma        -> contaminante_traduccion [xlabel="traduce"];
+    idioma        -> categoria_calidad_traduccion [xlabel="traduce"];
+    contaminante  -> contaminante_traduccion [xlabel="nombra"];
+    categoria_calidad -> categoria_calidad_traduccion [xlabel="nombra"];
+}
