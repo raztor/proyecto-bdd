@@ -47,6 +47,30 @@ export const DashboardQuery = z
 
 export type DashboardQueryInput = z.infer<typeof DashboardQuery>;
 
+// ── Gráficos — agregaciones de la tabla grande (MEDICION) para visualización ──
+// Comparten filtros con el dashboard salvo el idioma (los gráficos rotulan por
+// comuna/estación/tiempo, no por textos i18n). Si no se indica contaminante, el
+// endpoint usa PM2.5 por defecto (foco del indicador 11.6.2).
+export const GraficosQuery = z
+  .object({
+    contaminante_id: z.coerce.number().int().positive().optional(),
+    comuna_id: z.coerce.number().int().positive().optional(),
+    desde: fechaISO.optional(),
+    hasta: fechaISO.optional(),
+  })
+  .openapi('GraficosQuery');
+
+export type GraficosQueryInput = z.infer<typeof GraficosQuery>;
+
+// ── Estado actual por estación (mapa y panel de estado) ──────────────────────
+export const EstadoEstacionesQuery = z
+  .object({
+    idioma: z.string().min(2).max(10).default('es'),
+  })
+  .openapi('EstadoEstacionesQuery');
+
+export type EstadoEstacionesQueryInput = z.infer<typeof EstadoEstacionesQuery>;
+
 // ── Importación de estaciones desde OpenAQ ───────────────────────────────────
 const bbox = z
   .string()

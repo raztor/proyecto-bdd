@@ -4,6 +4,8 @@ import {
   RegistrarEstacionBody,
   ReporteCiudadanoBody,
   DashboardQuery,
+  GraficosQuery,
+  EstadoEstacionesQuery,
   BuscarOpenAqQuery,
   ImportarEstacionesBody,
   ImportarMedicionesBody,
@@ -56,6 +58,16 @@ export function buildOpenApiDocument() {
   });
 
   registry.registerPath({
+    method: 'get',
+    path: '/api/estaciones/estado',
+    tags: ['Dashboard'],
+    summary:
+      'Estado actual de cada estación: última medición por contaminante clasificada en su categoría de calidad, con la categoría más severa para el mapa. Usado por el panel de estado y el mapa.',
+    request: { query: EstadoEstacionesQuery },
+    responses: { 200: { description: 'Estado por estación (incluye lat/lon para el mapa)' } },
+  });
+
+  registry.registerPath({
     method: 'post',
     path: '/api/reportes',
     tags: ['Formularios'],
@@ -77,6 +89,16 @@ export function buildOpenApiDocument() {
       'Indicador 11.6.2 — AVG(valor) por comuna y contaminante, clasificado en su categoría de calidad. Filtros: comuna, contaminante y rango de fechas.',
     request: { query: DashboardQuery },
     responses: { 200: { description: 'Promedios clasificados por categoría' } },
+  });
+
+  registry.registerPath({
+    method: 'get',
+    path: '/api/graficos',
+    tags: ['Dashboard'],
+    summary:
+      'Agregaciones de MEDICION (millones de filas) para la zona de gráficos: resumen/KPIs, serie temporal mensual, ranking por comuna y por estación, perfil horario y estacionalidad. Filtros: contaminante, comuna y rango de fechas.',
+    request: { query: GraficosQuery },
+    responses: { 200: { description: 'Datasets agregados para los gráficos' } },
   });
 
   registry.registerPath({

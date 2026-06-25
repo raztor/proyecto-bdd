@@ -182,3 +182,163 @@ th {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
 }
+
+/* ── Zona de gráficos ─────────────────────────────────────────────────────── */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+.kpi {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  box-shadow: var(--shadow);
+}
+.kpi strong {
+  display: block;
+  font-size: 1.4rem;
+  color: var(--accent);
+  line-height: 1.2;
+}
+.kpi span {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+.charts-grid .card {
+  margin-bottom: 0;
+}
+.chart-full {
+  grid-column: 1 / -1;
+}
+.chart-title {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+@media (max-width: 720px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.barchart {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+.bar-row {
+  display: grid;
+  grid-template-columns: 9rem 1fr 5.5rem;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+}
+.bar-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bar-sub {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+.bar-track {
+  background: var(--bg);
+  border-radius: 999px;
+  height: 0.7rem;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  min-width: 2px;
+}
+.bar-value {
+  text-align: right;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.linechart {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.linechart .grid {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+.linechart .axis {
+  fill: var(--muted);
+  font-size: 11px;
+}
+
+/* ── Estado por estación + mapa ───────────────────────────────────────────── */
+.estado-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+.estado-grid .card {
+  margin-bottom: 0;
+}
+.estado-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+.estado-tabla {
+  font-size: 0.85rem;
+}
+.estado-tabla td {
+  padding: 0.3rem 0.4rem;
+}
+.estado-tabla td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.dot {
+  display: inline-block;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  margin-right: 0.35rem;
+  vertical-align: -1px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.map-container {
+  height: 480px;
+  width: 100%;
+  border-radius: 8px;
+  margin-top: 0.75rem;
+  z-index: 0;
+}
+/* El popup de Leaflet reusa los estilos de la tabla de estado. */
+.leaflet-popup-content strong {
+  font-size: 0.95rem;
+}

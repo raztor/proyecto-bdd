@@ -7,6 +7,7 @@ import { catalogosRouter } from './routes/catalogos';
 import { estacionesRouter } from './routes/estaciones';
 import { reportesRouter } from './routes/reportes';
 import { dashboardRouter } from './routes/dashboard';
+import { graficosRouter } from './routes/graficos';
 import { importacionRouter } from './routes/importacion';
 import { geoRouter } from './routes/geo';
 
@@ -24,6 +25,7 @@ export function createApp() {
   app.use('/api/estaciones', estacionesRouter);
   app.use('/api/reportes', reportesRouter);
   app.use('/api/dashboard', dashboardRouter);
+  app.use('/api/graficos', graficosRouter);
   app.use('/api/importacion', importacionRouter);
 
   // Documentación OpenAPI / Swagger.

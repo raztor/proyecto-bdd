@@ -38,12 +38,12 @@ proyecto-bdd/
 │       └── modelo_fisico.{dot,png,svg}  # modelo físico (tablas, PK, FK)
 ├── backend/                   # API Express + TypeScript
 │   └── src/
-│       ├── routes/             # estaciones (Form A), reportes (Form B), dashboard
+│       ├── routes/             # estaciones (Form A), reportes (Form B), dashboard, gráficos
 │       ├── db/                 # conexión Postgres y Mongo
 │       ├── audit/              # logger de auditoría -> MongoDB
 │       ├── schemas/            # validación Zod (+ OpenAPI)
 │       └── seed/seed.ts        # genera mediciones (1.000+) y auditoría (1.000+)
-└── frontend/                  # SPA React (dashboard + 2 formularios)
+└── frontend/                  # SPA React (dashboard + gráficos + estado + mapa + 2 formularios)
 ```
 
 ## Requisitos previos
@@ -94,9 +94,9 @@ cd frontend && npm install && npm run dev                  # SPA en :5173 (proxy
 | POC específico al indicador (no genérico) | El dashboard **es** el indicador: AVG de concentración por comuna/contaminante clasificado en categorías de salud |
 | ≥ 2 formularios con INSERT | Form A `POST /api/estaciones`, Form B `POST /api/reportes` |
 | Un formulario escribe en 2+ tablas con FK | Form A inserta en `ESTACION` y `ESTACION_CONTAMINANTE` (transacción) |
-| ≥ 1 visualización (SELECT) sobre tabla de 1.000+ | Dashboard: `AVG(valor)` sobre `MEDICION` (~69.000 filas) + JOINs |
-| Toda BD con ≥ 1.000 registros | `MEDICION` (~69.000) en Postgres; `auditoria` (1.200+) en MongoDB |
-| Filtro por ≥ 1 atributo | Dashboard filtra por comuna, contaminante y rango de fechas |
+| ≥ 1 visualización (SELECT) sobre tabla de 1.000+ | Dashboard: `AVG(valor)` sobre `MEDICION` + JOINs. **Gráficos** (`GET /api/graficos`): serie temporal, ranking por comuna/estación, perfil horario y estacionalidad. **Estado** y **Mapa** (`GET /api/estaciones/estado`): última medición por estación clasificada, sobre tarjetas y sobre un mapa Leaflet con popups |
+| Toda BD con ≥ 1.000 registros | `MEDICION` en Postgres (carga histórica opcional de ~5M filas, ver `db/maintenance/`); `auditoria` (1.200+) en MongoDB |
+| Filtro por ≥ 1 atributo | Dashboard y gráficos filtran por comuna, contaminante y rango de fechas |
 | BD relacional Y no relacional | PostgreSQL + MongoDB |
 | Modelo relacional en ≥ 2 idiomas | Tablas `CONTAMINANTE_TRADUCCION` y `CATEGORIA_CALIDAD_TRADUCCION` con textos es/en |
 | MER (conceptual) | `db/mer/mer.svg` (notación Chen) |

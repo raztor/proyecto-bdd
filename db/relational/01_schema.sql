@@ -72,6 +72,13 @@ CREATE TABLE medicion (
 CREATE UNIQUE INDEX idx_medicion_est_cont_fecha
     ON medicion (estacion_id, contaminante_id, fecha_hora);
 
+-- Índice de apoyo para la zona de gráficos: agrega por contaminante a lo largo
+-- del tiempo (serie temporal, estacionalidad, perfil horario, rankings). El
+-- índice único anterior lidera por estacion_id, así que un filtro solo por
+-- contaminante_id no lo aprovecha; este lo resuelve con index scan.
+CREATE INDEX idx_medicion_cont_fecha
+    ON medicion (contaminante_id, fecha_hora);
+
 -- ---------------------------------------------------------------------------
 --  Clasificación de calidad del aire y episodios críticos
 -- ---------------------------------------------------------------------------
