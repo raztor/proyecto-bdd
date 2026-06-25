@@ -229,56 +229,17 @@ th {
   }
 }
 
-.barchart {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
+/* Tooltip de los gráficos (Recharts) */
+.chart-tip {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+  padding: 0.4rem 0.6rem;
+  font-size: 0.82rem;
 }
-.bar-row {
-  display: grid;
-  grid-template-columns: 9rem 1fr 5.5rem;
-  align-items: center;
-  gap: 0.6rem;
+.chart-tip strong {
   font-size: 0.85rem;
-}
-.bar-label {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.bar-sub {
-  color: var(--muted);
-  font-size: 0.75rem;
-}
-.bar-track {
-  background: var(--bg);
-  border-radius: 999px;
-  height: 0.7rem;
-  overflow: hidden;
-}
-.bar-fill {
-  height: 100%;
-  border-radius: 999px;
-  min-width: 2px;
-}
-.bar-value {
-  text-align: right;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-
-.linechart {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-.linechart .grid {
-  stroke: var(--border);
-  stroke-width: 1;
-}
-.linechart .axis {
-  fill: var(--muted);
-  font-size: 11px;
 }
 
 /* ── Estado por estación + mapa ───────────────────────────────────────────── */

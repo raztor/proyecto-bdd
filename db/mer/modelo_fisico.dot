@@ -1,8 +1,15 @@
-digraph MER {
+// Modelo físico — tablas con tipos de datos, claves primarias/foráneas e
+// índices/restricciones. Fiel a db/relational/01_schema.sql.
+//
+//   Marcadores:  PK = clave primaria · FK = clave foránea · UQ = restricción
+//   UNIQUE · IX = índice · EX = restricción de exclusión (EXCLUDE USING gist).
+//   Las FK compuestas y restricciones físicas se anotan bajo cada tabla.
+
+digraph ModeloFisico {
     rankdir=LR;
     bgcolor="white";
     nodesep=0.7;
-    ranksep=1.6;
+    ranksep=1.7;
     splines=ortho;
     graph [fontname="Helvetica", pad="0.4"];
     node  [shape=plaintext, fontname="Helvetica", fontsize=10];
@@ -11,142 +18,163 @@ digraph MER {
 
     region [label=<
       <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
-        <tr><td bgcolor="#1565C0"><font color="white"><b>REGION</b></font></td></tr>
-        <tr><td align="left"><b>PK</b> id</td></tr>
-        <tr><td align="left">codigo</td></tr>
+        <tr><td colspan="2" bgcolor="#1565C0"><font color="white"><b>REGION</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left">codigo</td><td align="left">VARCHAR(10)</td></tr>
+        <tr><td colspan="2" align="left"><font color="#78909C" point-size="8"><i>UQ (codigo)</i></font></td></tr>
       </table>>];
 
     comuna [label=<
       <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
-        <tr><td bgcolor="#1565C0"><font color="white"><b>COMUNA</b></font></td></tr>
-        <tr><td align="left"><b>PK</b> id</td></tr>
-        <tr><td align="left"><b>FK</b> region_id</td></tr>
-        <tr><td align="left">nombre</td></tr>
-        <tr><td align="left">poblacion</td></tr>
+        <tr><td colspan="2" bgcolor="#1565C0"><font color="white"><b>COMUNA</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left"><b>FK</b> region_id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left">nombre</td><td align="left">VARCHAR(120)</td></tr>
+        <tr><td align="left">poblacion</td><td align="left">INTEGER</td></tr>
+        <tr><td colspan="2" align="left"><font color="#78909C" point-size="8"><i>UQ (region_id, nombre) · CHECK poblacion &#8805; 0</i></font></td></tr>
       </table>>];
 
     estacion [label=<
       <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
-        <tr><td bgcolor="#1565C0"><font color="white"><b>ESTACION</b></font></td></tr>
-        <tr><td align="left"><b>PK</b> id</td></tr>
-        <tr><td align="left"><b>FK</b> comuna_id</td></tr>
-        <tr><td align="left">nombre</td></tr>
-        <tr><td align="left">latitud</td></tr>
-        <tr><td align="left">longitud</td></tr>
-        <tr><td align="left">fecha_instalacion</td></tr>
+        <tr><td colspan="2" bgcolor="#1565C0"><font color="white"><b>ESTACION</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left"><b>FK</b> comuna_id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left">nombre</td><td align="left">VARCHAR(120)</td></tr>
+        <tr><td align="left">latitud</td><td align="left">DECIMAL(9,6)</td></tr>
+        <tr><td align="left">longitud</td><td align="left">DECIMAL(9,6)</td></tr>
+        <tr><td align="left">fecha_instalacion</td><td align="left">DATE</td></tr>
+        <tr><td colspan="2" align="left"><font color="#78909C" point-size="8"><i>UQ (nombre) · UQ (id, comuna_id)</i></font></td></tr>
       </table>>];
 
     unidad_medida [label=<
       <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
-        <tr><td bgcolor="#00838F"><font color="white"><b>UNIDAD_MEDIDA</b></font></td></tr>
-        <tr><td align="left"><b>PK</b> id</td></tr>
-        <tr><td align="left">simbolo</td></tr>
+        <tr><td colspan="2" bgcolor="#00838F"><font color="white"><b>UNIDAD_MEDIDA</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left">simbolo</td><td align="left">VARCHAR(20)</td></tr>
+        <tr><td colspan="2" align="left"><font color="#78909C" point-size="8"><i>UQ (simbolo)</i></font></td></tr>
       </table>>];
 
     contaminante [label=<
       <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
-        <tr><td bgcolor="#00838F"><font color="white"><b>CONTAMINANTE</b></font></td></tr>
-        <tr><td align="left"><b>PK</b> id</td></tr>
-        <tr><td align="left"><b>FK</b> unidad_id</td></tr>
-        <tr><td align="left">codigo</td></tr>
+        <tr><td colspan="2" bgcolor="#00838F"><font color="white"><b>CONTAMINANTE</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left"><b>FK</b> unidad_id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left">codigo</td><td align="left">VARCHAR(20)</td></tr>
+        <tr><td colspan="2" align="left"><font color="#78909C" point-size="8"><i>UQ (codigo)</i></font></td></tr>
       </table>>];
 
     estacion_contaminante [label=<
       <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
-        <tr><td bgcolor="#546E7A"><font color="white"><b>ESTACION_CONTAMINANTE</b></font></td></tr>
-        <tr><td align="left"><b>PK,FK</b> estacion_id</td></tr>
-        <tr><td align="left"><b>PK,FK</b> contaminante_id</td></tr>
-        <tr><td align="left">activo</td></tr>
+        <tr><td colspan="2" bgcolor="#546E7A"><font color="white"><b>ESTACION_CONTAMINANTE</b></font></td></tr>
+        <tr><td align="left"><b>PK,FK</b> estacion_id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left"><b>PK,FK</b> contaminante_id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left">activo</td><td align="left">BOOLEAN</td></tr>
       </table>>];
 
     medicion [label=<
       <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
-        <tr><td bgcolor="#00838F"><font color="white"><b>MEDICION</b></font></td></tr>
-        <tr><td align="left"><b>PK</b> id (BIGINT)</td></tr>
-        <tr><td align="left"><b>FK</b> estacion_id</td></tr>
-        <tr><td align="left"><b>FK</b> contaminante_id</td></tr>
-        <tr><td align="left">fecha_hora</td></tr>
-        <tr><td align="left">valor</td></tr>
-        <tr><td align="left">validado</td></tr>
+        <tr><td colspan="2" bgcolor="#00838F"><font color="white"><b>MEDICION</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> id</td><td align="left">BIGINT</td></tr>
+        <tr><td align="left"><b>FK</b> estacion_id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left"><b>FK</b> contaminante_id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left">fecha_hora</td><td align="left">TIMESTAMP</td></tr>
+        <tr><td align="left">valor</td><td align="left">DECIMAL(8,2)</td></tr>
+        <tr><td align="left">validado</td><td align="left">BOOLEAN</td></tr>
+        <tr><td colspan="2" align="left"><font color="#78909C" point-size="8"><i>FK (estacion_id, contaminante_id) &#8594; estacion_contaminante</i></font></td></tr>
+        <tr><td colspan="2" align="left"><font color="#78909C" point-size="8"><i>UQ IX idx_medicion_est_cont_fecha (estacion_id, contaminante_id, fecha_hora)</i></font></td></tr>
+        <tr><td colspan="2" align="left"><font color="#78909C" point-size="8"><i>IX idx_medicion_cont_fecha (contaminante_id, fecha_hora)</i></font></td></tr>
+        <tr><td colspan="2" align="left"><font color="#78909C" point-size="8"><i>CHECK valor &#8805; 0</i></font></td></tr>
       </table>>];
 
     categoria_calidad [label=<
       <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
-        <tr><td bgcolor="#00838F"><font color="white"><b>CATEGORIA_CALIDAD</b></font></td></tr>
-        <tr><td align="left"><b>PK</b> id</td></tr>
-        <tr><td align="left"><b>FK</b> contaminante_id</td></tr>
-        <tr><td align="left">codigo</td></tr>
-        <tr><td align="left">rango (numrange)</td></tr>
-        <tr><td align="left">color_hex</td></tr>
+        <tr><td colspan="2" bgcolor="#00838F"><font color="white"><b>CATEGORIA_CALIDAD</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left"><b>FK</b> contaminante_id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left">codigo</td><td align="left">VARCHAR(20)</td></tr>
+        <tr><td align="left">rango</td><td align="left">NUMRANGE</td></tr>
+        <tr><td align="left">color_hex</td><td align="left">VARCHAR(7)</td></tr>
+        <tr><td colspan="2" align="left"><font color="#78909C" point-size="8"><i>UQ (contaminante_id, codigo) · UQ (contaminante_id, id)</i></font></td></tr>
+        <tr><td colspan="2" align="left"><font color="#78909C" point-size="8"><i>EX EXCLUDE gist (contaminante_id =, rango &amp;&amp;)</i></font></td></tr>
       </table>>];
 
     episodio [label=<
       <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
-        <tr><td bgcolor="#C62828"><font color="white"><b>EPISODIO</b></font></td></tr>
-        <tr><td align="left"><b>PK</b> id</td></tr>
-        <tr><td align="left"><b>FK</b> comuna_id</td></tr>
-        <tr><td align="left"><b>FK</b> contaminante_id</td></tr>
-        <tr><td align="left"><b>FK</b> categoria_id</td></tr>
-        <tr><td align="left">fecha</td></tr>
+        <tr><td colspan="2" bgcolor="#C62828"><font color="white"><b>EPISODIO</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left"><b>FK</b> comuna_id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left"><b>FK</b> contaminante_id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left"><b>FK</b> categoria_id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left">fecha</td><td align="left">DATE</td></tr>
+        <tr><td colspan="2" align="left"><font color="#78909C" point-size="8"><i>FK (contaminante_id, categoria_id) &#8594; categoria_calidad</i></font></td></tr>
+        <tr><td colspan="2" align="left"><font color="#78909C" point-size="8"><i>UQ (id, comuna_id) · UQ (comuna_id, contaminante_id, fecha)</i></font></td></tr>
       </table>>];
 
     episodio_estacion [label=<
       <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
-        <tr><td bgcolor="#546E7A"><font color="white"><b>EPISODIO_ESTACION</b></font></td></tr>
-        <tr><td align="left"><b>PK,FK</b> episodio_id</td></tr>
-        <tr><td align="left"><b>FK</b> comuna_id</td></tr>
-        <tr><td align="left"><b>PK,FK</b> estacion_id</td></tr>
-        <tr><td align="left">valor_promedio</td></tr>
+        <tr><td colspan="2" bgcolor="#546E7A"><font color="white"><b>EPISODIO_ESTACION</b></font></td></tr>
+        <tr><td align="left"><b>PK,FK</b> episodio_id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left"><b>FK</b> comuna_id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left"><b>PK,FK</b> estacion_id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left">valor_promedio</td><td align="left">DECIMAL(8,2)</td></tr>
+        <tr><td colspan="2" align="left"><font color="#78909C" point-size="8"><i>FK (episodio_id, comuna_id) &#8594; episodio (id, comuna_id)</i></font></td></tr>
+        <tr><td colspan="2" align="left"><font color="#78909C" point-size="8"><i>FK (estacion_id, comuna_id) &#8594; estacion (id, comuna_id)</i></font></td></tr>
       </table>>];
 
     reporte_ciudadano [label=<
       <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
-        <tr><td bgcolor="#2E7D32"><font color="white"><b>REPORTE_CIUDADANO</b></font></td></tr>
-        <tr><td align="left"><b>PK</b> id</td></tr>
-        <tr><td align="left"><b>FK</b> comuna_id</td></tr>
-        <tr><td align="left">fecha_hora</td></tr>
-        <tr><td align="left">nivel_percibido</td></tr>
+        <tr><td colspan="2" bgcolor="#2E7D32"><font color="white"><b>REPORTE_CIUDADANO</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left"><b>FK</b> comuna_id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left">fecha_hora</td><td align="left">TIMESTAMP</td></tr>
+        <tr><td align="left">nivel_percibido</td><td align="left">SMALLINT</td></tr>
+        <tr><td colspan="2" align="left"><font color="#78909C" point-size="8"><i>IX idx_reporte_ciudadano_comuna_fecha (comuna_id, fecha_hora DESC)</i></font></td></tr>
+        <tr><td colspan="2" align="left"><font color="#78909C" point-size="8"><i>CHECK nivel_percibido &#8712; [1,5]</i></font></td></tr>
       </table>>];
 
     idioma [label=<
       <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
-        <tr><td bgcolor="#6A1B9A"><font color="white"><b>IDIOMA</b></font></td></tr>
-        <tr><td align="left"><b>PK</b> codigo</td></tr>
-        <tr><td align="left">nombre</td></tr>
+        <tr><td colspan="2" bgcolor="#6A1B9A"><font color="white"><b>IDIOMA</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> codigo</td><td align="left">VARCHAR(10)</td></tr>
+        <tr><td align="left">nombre</td><td align="left">VARCHAR(60)</td></tr>
+        <tr><td colspan="2" align="left"><font color="#78909C" point-size="8"><i>UQ (nombre)</i></font></td></tr>
       </table>>];
 
     contaminante_traduccion [label=<
       <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
-        <tr><td bgcolor="#6A1B9A"><font color="white"><b>CONTAMINANTE_TRADUCCION</b></font></td></tr>
-        <tr><td align="left"><b>PK,FK</b> contaminante_id</td></tr>
-        <tr><td align="left"><b>PK,FK</b> idioma_codigo</td></tr>
-        <tr><td align="left">nombre</td></tr>
-        <tr><td align="left">descripcion</td></tr>
+        <tr><td colspan="2" bgcolor="#6A1B9A"><font color="white"><b>CONTAMINANTE_TRADUCCION</b></font></td></tr>
+        <tr><td align="left"><b>PK,FK</b> contaminante_id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left"><b>PK,FK</b> idioma_codigo</td><td align="left">VARCHAR(10)</td></tr>
+        <tr><td align="left">nombre</td><td align="left">VARCHAR(120)</td></tr>
+        <tr><td align="left">descripcion</td><td align="left">TEXT</td></tr>
       </table>>];
 
     categoria_calidad_traduccion [label=<
       <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
-        <tr><td bgcolor="#6A1B9A"><font color="white"><b>CATEGORIA_CALIDAD_TRADUCCION</b></font></td></tr>
-        <tr><td align="left"><b>PK,FK</b> categoria_id</td></tr>
-        <tr><td align="left"><b>PK,FK</b> idioma_codigo</td></tr>
-        <tr><td align="left">nombre</td></tr>
-        <tr><td align="left">recomendacion</td></tr>
+        <tr><td colspan="2" bgcolor="#6A1B9A"><font color="white"><b>CATEGORIA_CALIDAD_TRADUCCION</b></font></td></tr>
+        <tr><td align="left"><b>PK,FK</b> categoria_id</td><td align="left">INTEGER</td></tr>
+        <tr><td align="left"><b>PK,FK</b> idioma_codigo</td><td align="left">VARCHAR(10)</td></tr>
+        <tr><td align="left">nombre</td><td align="left">VARCHAR(80)</td></tr>
+        <tr><td align="left">recomendacion</td><td align="left">TEXT</td></tr>
       </table>>];
 
     evento_auditoria_relacional [label=<
       <table border="0" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="white">
-        <tr><td bgcolor="#455A64"><font color="white"><b>EVENTO_AUDITORIA_RELACIONAL</b></font></td></tr>
-        <tr><td align="left"><b>PK</b> id (BIGINT)</td></tr>
-        <tr><td align="left">base_datos</td></tr>
-        <tr><td align="left">operacion</td></tr>
-        <tr><td align="left">recurso</td></tr>
-        <tr><td align="left">usuario_logico</td></tr>
-        <tr><td align="left">ocurrido_en</td></tr>
-        <tr><td align="left">criterio</td></tr>
-        <tr><td align="left">datos_antes</td></tr>
-        <tr><td align="left">datos_despues</td></tr>
-        <tr><td align="left">resultado</td></tr>
-        <tr><td align="left">sincronizado_mongo</td></tr>
+        <tr><td colspan="2" bgcolor="#455A64"><font color="white"><b>EVENTO_AUDITORIA_RELACIONAL</b></font></td></tr>
+        <tr><td align="left"><b>PK</b> id</td><td align="left">BIGINT</td></tr>
+        <tr><td align="left">base_datos</td><td align="left">VARCHAR(20)</td></tr>
+        <tr><td align="left">operacion</td><td align="left">VARCHAR(10)</td></tr>
+        <tr><td align="left">recurso</td><td align="left">VARCHAR(80)</td></tr>
+        <tr><td align="left">usuario_logico</td><td align="left">VARCHAR(120)</td></tr>
+        <tr><td align="left">ocurrido_en</td><td align="left">TIMESTAMPTZ</td></tr>
+        <tr><td align="left">criterio</td><td align="left">JSONB</td></tr>
+        <tr><td align="left">datos_antes</td><td align="left">JSONB</td></tr>
+        <tr><td align="left">datos_despues</td><td align="left">JSONB</td></tr>
+        <tr><td align="left">resultado</td><td align="left">VARCHAR(10)</td></tr>
+        <tr><td align="left">sincronizado_mongo</td><td align="left">BOOLEAN</td></tr>
+        <tr><td align="left">sincronizado_en</td><td align="left">TIMESTAMPTZ</td></tr>
+        <tr><td colspan="2" align="left"><font color="#78909C" point-size="8"><i>IX (recurso, ocurrido_en DESC) · IX (operacion, ocurrido_en DESC)</i></font></td></tr>
+        <tr><td colspan="2" align="left"><font color="#78909C" point-size="8"><i>IX parcial (sincronizado_mongo, ocurrido_en) WHERE NOT sincronizado_mongo</i></font></td></tr>
       </table>>];
 
     region        -> comuna                [xlabel="tiene"];
@@ -166,4 +194,20 @@ digraph MER {
     idioma        -> categoria_calidad_traduccion [xlabel="traduce"];
     contaminante  -> contaminante_traduccion [xlabel="nombra"];
     categoria_calidad -> categoria_calidad_traduccion [xlabel="nombra"];
+
+    // Nota: la tabla EVENTO_AUDITORIA_RELACIONAL no tiene FK al dominio; se
+    // alimenta por triggers (INSERT/UPDATE/DELETE) y por la función
+    // registrar_select_auditoria() para los SELECT. La proyección no relacional
+    // vive en la colección Mongo "auditoria" (ver db/nosql/).
+    leyenda [
+        shape=note, style="filled", fillcolor="#FFF9C4", color="#9E9D24",
+        fontname="Helvetica", fontsize=9, penwidth=1.0,
+        label=<<table border="0" cellborder="0" cellspacing="2" cellpadding="2">
+          <tr><td align="left"><b>Convenciones</b></td></tr>
+          <tr><td align="left">PK clave primaria · FK clave foránea</td></tr>
+          <tr><td align="left">UQ UNIQUE · IX índice · EX EXCLUDE (gist)</td></tr>
+          <tr><td align="left">Tipos según db/relational/01_schema.sql</td></tr>
+          <tr><td align="left">EXCLUDE requiere la extensión btree_gist</td></tr>
+        </table>>
+    ];
 }

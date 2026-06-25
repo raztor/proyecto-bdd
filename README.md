@@ -22,7 +22,8 @@ proyecto-bdd/
 ├── .env.example               # variables (copiar a .env)
 ├── docs/
 │   ├── instrucciones.pdf       # enunciado del proyecto
-│   └── informe.md              # problemática, solución, datos e indicador
+│   ├── informe.md              # problemática, solución, datos e indicador
+│   └── justificacion.md        # cumplimiento de requisitos + por qué Postgres/Mongo
 ├── db/
 │   ├── relational/            # DDL + catálogos (se auto-cargan en Postgres)
 │   │   ├── 01_schema.sql       #   modelo físico (CREATE TABLE, PK, FK, índices)
